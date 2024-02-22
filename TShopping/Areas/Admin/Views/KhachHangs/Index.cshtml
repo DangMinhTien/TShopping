@@ -1,0 +1,120 @@
+﻿@model IEnumerable<KhachHang>
+@{
+    var pagingModel = ViewBag.Paging as PagingModel;
+}
+<div class="mb-5 d-flex justify-content-between align-content-center">
+    <form class="d-flex align-content-center" asp-action="Index" asp-controller="KhachHangs" asp-area="Admin" method="get">
+        <input type="text" name="search" class="mx-1" placeholder="Tìm theo tên" value="@ViewBag.search" />
+        <input type="submit" class="btn btn-primary" value="Tìm" />
+    </form>
+</div>
+<table class="table table-bordered" style="width: 100%; overflow-x: scroll">
+    <tr>
+        <th>Mã khách hàng</th>
+        <th>Họ tên</th>
+        <th>Giới tính</th>
+        <th>Ngày sinh</th>
+        <th>Địa chỉ</th>
+        <th>Điện thoại</th>
+        <th>Email</th>
+        <th>Hiệu lực</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr data-id="@item.MaKh">
+            <td>@item.MaKh</td>
+            <td>@item.HoTen</td>
+            <td>
+                @if(item.GioiTinh == true)
+                {
+                    <span>Nam</span>
+                }
+                else
+                {
+                    <span>Nữ</span>
+                }
+            </td>
+            <td>@item.NgaySinh.ToString("dd-MM-yyyy")</td>
+            <td>@item.DiaChi</td>
+            <td>@item.DienThoai</td>
+            <td>@item.Email</td>
+            <td class="tr-effect" data-effect="@item.HieuLuc" data-makh="@item.MaKh">
+                @if (item.HieuLuc == true)
+                {
+                    <a style="cursor: pointer" class="text-success effect">Đang hoạt động</a>
+                }
+                else
+                {
+                    <a style="cursor: pointer" class="text-danger effect">Bị vô hiệu hóa</a>
+                }
+            </td>
+            <td class="d-flex">
+                <button type="button" class="btn btn-danger btnDelete mx-1">Xóa</button>
+            </td>
+        </tr>
+    }
+</table>
+<partial name="_PagingAdminPartial" model="@pagingModel"></partial>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.tr-effect').on('click', '.effect',function () {
+                console.log('ok')
+                var td = $(this).closest('td')
+                var effect = $(this).closest('td').attr('data-effect')
+                console.log(effect)
+                var makh = $(this).closest('td').attr('data-makh')
+                var formData = new FormData()
+                formData.append("MaKh", makh)
+                $.ajax({
+                    url: '@Url.Action("ChangeEffect", "KhachHangs", new { area = "Admin" })',
+                    type: "POST",
+                    data: formData,
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (effect == 'True') {
+                            td.html(`<a style="cursor: pointer" class="text-danger effect">Bị vô hiệu hóa</a>`)
+                            td.attr('data-effect', 'False')
+                        }
+                        else{
+                            td.html(` <a style="cursor: pointer" class="text-success effect">Đang hoạt động</a>`)
+                            td.attr('data-effect', 'True')
+                        }
+                        alert("Sửa hiệu lực khách hàng thành công")
+                    },
+                    error: function (response) {
+                        alert(`${response.responseJSON.errorClient}`)
+                        console.log(`${response.responseJSON.errorDev}`)
+                    }
+                })
+            })
+            $('.btnDelete').click(function () {
+                var tr = $(this).closest('tr')
+                var maKh = tr.attr('data-id')
+                var tenKh = tr.children('td:eq(1)').text()
+                if (confirm(`Bạn có muốn xóa khách hàng ${tenKh} không ?`)) {
+                    var formData = new FormData()
+                    formData.append("MaKh", maKh)
+                    $.ajax({
+                        url: '@Url.Action("Delete", "KhachHangs", new { area = "Admin" })',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            alert("Bạn vừa xóa khách hàng thành công")
+                            window.location.href = "/Admin/KhachHangs/Index?page=@pagingModel?.currentPage&search=@ViewBag.search"
+                        },
+                        error: function (response) {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    })
+                }
+            })
+        })
+    </script>
+}

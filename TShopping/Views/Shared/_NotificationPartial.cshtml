@@ -1,0 +1,67 @@
+﻿<div class="m-toast-box">
+    @if (TempData["success"] != null || TempData["error"] != null)
+    {
+        @if (TempData["success"] != null)
+        {
+            <div class="m-toast-message m-toast-success">
+                <div class="m-toast-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="m-toast-text">@TempData["success"]</div>
+                <div class="m-toast-close">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+        }
+        @if (TempData["error"] != null)
+        {
+            <div class="m-toast-message m-toast-error">
+                <div class="m-toast-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="m-toast-text">@TempData["error"]</div>
+                <div class="m-toast-close">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+        }
+    }
+</div>
+@* <div class="m-toast-box">
+    <div class="m-toast-message m-toast-success">
+        <div class="m-toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="m-toast-text">Đây là một thông báo đã hoàn thành mục tiêu trong năm 2023 và đến!</div>
+        <div class="m-toast-close">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+    <div class="m-toast-message m-toast-error">
+        <div class="m-toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="m-toast-text">Đây là một thông báo đã hoàn thành mục tiêu trong năm 2023 và đến!</div>
+        <div class="m-toast-close">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+    <div class="m-toast-message m-toast-warning">
+        <div class="m-toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="m-toast-text">Đây là một thông báo đã hoàn thành mục tiêu trong năm 2023 và đến!</div>
+        <div class="m-toast-close">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+    <div class="m-toast-message m-toast-infor">
+        <div class="m-toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="m-toast-text">Đây là một thông báo đã hoàn thành mục tiêu trong năm 2023 và đến!</div>
+        <div class="m-toast-close">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+</div> *@

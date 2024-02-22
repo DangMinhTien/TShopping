@@ -1,0 +1,121 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 992px) {
+    .page-content {
+        margin-top: 152px !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .page-content {
+        margin-top: 97px !important;
+    }
+}
+.activeCatelogy a{
+    color: #FFB524 !important;
+}
+
+.m-toast-box {
+    position: fixed;
+    top: 10px;
+    right: 0;
+    display: block;
+    z-index: 2;
+}
+
+    .m-toast-box .m-toast-message {
+        min-height: 48px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        padding: 0 10px 0 16px;
+        margin-bottom: 8px;
+        margin-right: 8px;
+        max-width: 250px;
+        min-width: 300px;
+        box-shadow: rgba(0, 0, 0, 0.5) 4px 4px 4px;
+    }
+
+        .m-toast-box .m-toast-message .m-toast-icon {
+            font-size: 20px;
+        }
+
+        .m-toast-box .m-toast-message .m-toast-text {
+            color: #000;
+            margin: 0 8px;
+            flex: 1;
+        }
+
+        .m-toast-box .m-toast-message .m-toast-close {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+    .m-toast-box .m-toast-success {
+        background-color: #baffe7;
+    }
+
+        .m-toast-box .m-toast-success i {
+            color: #019160;
+        }
+
+            .m-toast-box .m-toast-success i:hover {
+                color: #02754f;
+            }
+
+    .m-toast-box .m-toast-error {
+        background-color: #ffcece;
+    }
+
+        .m-toast-box .m-toast-error i {
+            color: #ff4747;
+        }
+
+            .m-toast-box .m-toast-error i:hover {
+                color: #de1f1f;
+            }
+
+    .m-toast-box .m-toast-warning {
+        background-color: #ffe7af;
+    }
+
+        .m-toast-box .m-toast-warning i {
+            color: #fa9f47;
+        }
+
+            .m-toast-box .m-toast-warning i:hover {
+                color: #eb801c;
+            }
+
+    .m-toast-box .m-toast-infor {
+        background-color: #d8eaff;
+    }
+
+        .m-toast-box .m-toast-infor i {
+            color: #0090e0;
+        }
+
+            .m-toast-box .m-toast-infor i:hover {
+                color: #0676b2;
+            }

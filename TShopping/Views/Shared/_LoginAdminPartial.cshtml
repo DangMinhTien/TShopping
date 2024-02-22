@@ -1,0 +1,22 @@
+﻿@using TShopping.Helpers
+@inject TShopping.Data.TshoppingContext _context
+@{
+}
+<div class="float-end">
+    <ul class="navbar-nav flex-grow-1">
+        @if (Context.User.Identity.IsAuthenticated)
+        {
+            <li class="nav-item">
+                <a class="nav-link text-light" asp-area="" asp-controller="NhanVien" asp-action="DangXuat">Đăng xuất</a>
+            </li>
+            var userId = Context.User.FindFirst(MySetting.Claim_EmployeeId)?.Value;
+            var nhanVien = _context.NhanViens.FirstOrDefault(nv => nv.MaNv == userId);
+            if(nhanVien != null)
+            {
+                <li class="nav-item">
+                    <a class="nav-link text-light" asp-area="Admin" asp-controller="NhanViens" asp-action="Profile">@nhanVien?.HoTen - @nhanVien?.MaNv</a>
+                </li>
+            }
+        }
+    </ul>
+</div>

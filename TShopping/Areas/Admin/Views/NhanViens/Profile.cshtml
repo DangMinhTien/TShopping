@@ -1,0 +1,151 @@
+﻿@model NhanVien
+@{
+}
+<h2>Quản lý tài khoản</h2>
+
+<div>
+    <h4>Thay đổi thông tin nhân viên</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item"><a class="nav-link bg-primary text-white link" style="cursor: pointer">Thông tin nhân viên</a></li>
+                <li class="nav-item"><a class="nav-link link" style="cursor: pointer">Mật khẩu</a></li>
+            </ul>
+        </div>
+        <div class="col-md-9">
+            <div class="row content">
+                <div class="col-md-6">
+                    <div id="errMesProfile" class="text-danger"></div>
+                    <div class="form-group">
+                        <label>Mã nhân viên</label>
+                        <input id="MaNv" class="form-control" disabled value="@Model.MaNv"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input id="Email" class="form-control" value="@Model.Email" />
+                    </div>
+                    <div class="form-group">
+                        <label>Họ tên</label>
+                        <input id="HoTen" class="form-control" value="@Model.HoTen" />
+                    </div>
+                    <button id="update-profile-button" type="button" class="btn btn-primary my-2">Lưu</button>
+                </div>
+            </div>
+            <div class="row content d-none">
+                <div class="col-md-6">
+                    <div id="errMesPassword" class="text-danger"></div>
+                    <div class="form-group">
+                        <label>Mật khẩu cũ</label>
+                        <input id="MatKhauCu" type="password" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu mới</label>
+                        <input id="MatKhauMoi" type="password" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="ShowPassword" /> Hiển thị mật khẩu
+                    </div>
+                    <button id="update-password-button" type="button" class="btn btn-primary my-2">Đổi mật khẩu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        console.log("Lên")
+        $(document).ready(function () {
+            // Hiển thị màu và bg cho phần sidebar
+            $('.link').click(function(){
+                $('.link').removeClass('bg-primary')
+                $('.link').removeClass('text-white')
+                $(this).addClass('bg-primary')
+                $(this).addClass('text-white')
+                console.log('Oke chưa')
+            })
+            // Hiển thị cho phần content
+            $('.link').each(function (index, element) {
+                $(element).click(function () {
+                    $('.content').addClass('d-none')
+                    var contents = $('.content')
+                    $(contents[index]).removeClass('d-none')
+                })
+            })
+            // Hiển thị mật khẩu
+            $('#ShowPassword').change(function () {
+                if ($(this).prop('checked') == true) {
+                    $('#MatKhauCu').attr('type', 'text')
+                    $('#MatKhauMoi').attr('type', 'text')
+                } else {
+                    $('#MatKhauCu').attr('type', 'password')
+                    $('#MatKhauMoi').attr('type', 'password')
+                }
+            })
+            $('#update-profile-button').click(function(){
+                var formData = new FormData()
+                formData.append('MaNv', $('#MaNv').val())
+                formData.append('Email', $('#Email').val())
+                formData.append('HoTen', $('#HoTen').val())
+                $.ajax({
+                    url: '@Url.Action("EditProfile", "NhanViens", new { area = "Admin" })',
+                    type: "POST",
+                    data: formData,
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        alert("Bạn vừa cập nhật thông tin thành công")
+                        window.location.href = '@Url.Action("Profile","NhanViens",new {area = "Admin"})'
+                    },
+                    error: function (response) {
+                        if (response.responseJSON.isvalid == false) {
+                            var err = ""
+                            for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                err += `<p>${response.responseJSON.error[i]}</p>`
+                            }
+                            $('#errMesProfile').html(err)
+                            console.log(response)
+                        }
+                        else {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    }
+                })
+            })
+            $('#update-password-button').click(function () {
+                var formData = new FormData()
+                formData.append('MatKhauCu', $('#MatKhauCu').val())
+                formData.append('MatKhauMoi', $('#MatKhauMoi').val())
+                formData.append('MaNv', $('#MaNv').val())
+                $.ajax({
+                    url: '@Url.Action("ChangePassword", "NhanViens", new { area = "Admin" })',
+                    type: "POST",
+                    data: formData,
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        alert("Bạn vừa thay đổi mật khẩu thành công")
+                        window.location.href = '@Url.Action("DangXuat", "NhanVien", new {area = ""})'
+                    },
+                    error: function (response) {
+                        if (response.responseJSON.isvalid == false) {
+                            var err = ""
+                            for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                err += `<p>${response.responseJSON.error[i]}</p>`
+                            }
+                            $('#errMesPassword').html(err)
+                            console.log(response)
+                        }
+                        else {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    }
+                })
+            })
+        })    
+    </script>
+}

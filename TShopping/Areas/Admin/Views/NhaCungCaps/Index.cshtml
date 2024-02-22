@@ -1,0 +1,244 @@
+﻿@model IEnumerable<NhaCungCap>
+@{
+}
+<div class="mb-5 d-flex justify-content-between align-content-center">
+    <button type="button" id="btnAdd" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddModal">Thêm mới</button>
+</div>
+<table class="table table-bordered" style="width: 100%; overflow-x: scroll">
+    <tr>
+        <th>Mã nhà cung cấp</th>
+        <th>Tên công ty</th>
+        <th>Người liên lạc</th>
+        <th>Email</th>
+        <th>Điện thoại</th>
+        <th>Địa chỉ</th>
+        <th>Mô tả</th>
+        <th>Logo</th>
+        <th>Chức năng</th>
+    </tr>
+    @foreach(var item in Model)
+    {
+        <tr data-id="@item.MaNcc">
+            <td>@item.MaNcc</td>
+            <td>@item.TenCongTy</td>
+            <td>@item.NguoiLienLac</td>
+            <td>@item.Email</td>
+            <td>@item.DienThoai</td>
+            <td>@item.DiaChi</td>
+            <td>@item.MoTa</td>
+            <td>
+                <img class="img-thumbnail" src="~/Hinh/NhaCC/@item.Logo" alt="@item.TenCongTy" />
+            </td>
+            <td class="d-flex">
+                <button type="button" class="btn btn-warning btnEdit mx-1" data-bs-toggle="modal" data-bs-target="#AddModal">Sửa</button>
+                <button type="button" class="btn btn-danger btnDelete mx-1">Xóa</button>
+            </td>
+        </tr>
+    }
+</table>
+<div class="modal fade" id="AddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 750px!important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nhà cung cấp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-danger" id="errMes"></div>
+                <div class="row">
+                    <div class="col-xl-6 col-sm-12">
+                        <input type="hidden" id="MaNCC"/>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Tên công ty:</label>
+                            <input type="text" class="form-control" id="TenCongTy">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Người liên lạc:</label>
+                            <input type="text" class="form-control" id="NguoiLienLac">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Email:</label>
+                            <input type="text" class="form-control" id="Email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Logo:</label>
+                            <input type="file" class="form-control" id="Logo">
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Điện thoại:</label>
+                            <input type="text" class="form-control" id="DienThoai">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Địa chỉ:</label>
+                            <input type="text" class="form-control" id="DiaChi">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Mô tả:</label>
+                            <textarea class="form-control" id="MoTa" rows="1"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <img style="width: 200px; max-height: 100px!important; object-fit: contain" id="ImagePreview" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary" id="btnSubmit"></button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Lắng nghe sự kiện change của input file
+            var fileInput = document.getElementById('Logo');
+            fileInput.addEventListener('change', function (event) {
+                // Gọi hàm để hiển thị ảnh
+                displayImage(event.target);
+            });
+        });
+
+        function displayImage(input) {
+            var file = input.files[0];
+
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // Hiển thị ảnh lên thẻ img
+                    var imagePreview = document.getElementById('ImagePreview');
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+
+                // Đọc dữ liệu của file ảnh
+                reader.readAsDataURL(file);
+            }
+        }
+        var fuc = 'add'
+        $(document).ready(function () {
+            $('.btnEdit').click(function () {
+                fuc = 'edit'
+                $('#btnSubmit').text('Sửa')
+                $('#errMes').html('')
+                var trParent = $(this).closest('tr')
+                $('#MaNCC').val(trParent.children('td:eq(0)').text())
+                $('#TenCongTy').val(trParent.children('td:eq(1)').text())
+                $('#NguoiLienLac').val(trParent.children('td:eq(2)').text())
+                $('#Email').val(trParent.children('td:eq(3)').text())
+                $('#DienThoai').val(trParent.children('td:eq(4)').text())
+                $('#DiaChi').val(trParent.children('td:eq(5)').text())
+                $('#MoTa').val(trParent.children('td:eq(6)').text())
+                $('#ImagePreview').attr('src', trParent.children('td:eq(7)').children('img').attr('src'))
+            })
+            $('#btnAdd').click(function () {
+                fuc = 'add'
+                $('#btnSubmit').text('Thêm')
+                $('#errMes').html('')
+                $('#ImagePreview').attr('src', '')
+                console.log(fuc)
+            })
+            $('.btnDelete').click(function () {
+                var trParent = $(this).closest('tr')
+                var MaNCC = trParent.children('td:eq(0)').text()
+                var TenCongTy = trParent.children('td:eq(1)').text()
+                if (confirm(`Bạn có muốn xóa ${TenCongTy} không ?`)) {
+                    var formDelete = new FormData()
+                    formDelete.append("MaNCC", MaNCC)
+                    $.ajax({
+                        url: '@Url.Action("Delete", "NhaCungCaps", new { area = "Admin" })',
+                        type: "POST",
+                        data: formDelete,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            alert("Xóa nhà cung cấp thành công")
+                            window.location.href = '@Url.Action("Index", "NhaCungCaps", new { area = "Admin" })'
+                        },
+                        error: function (response) {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    })
+                }
+            })
+            $('#btnSubmit').click(function () {
+                var formData = new FormData()
+                formData.append("TenCongTy", $('#TenCongTy').val())
+                formData.append("NguoiLienLac", $('#NguoiLienLac').val())
+                formData.append("Email", $('#Email').val())
+                formData.append("DienThoai", $('#DienThoai').val())
+                formData.append("DiaChi", $('#DiaChi').val())
+                formData.append("MoTa", $('#MoTa').val())
+                formData.append("Logo", document.getElementById('Logo').files[0])
+                console.log(formData)
+                if (fuc == 'add') {
+                    $.ajax({
+                        url: '@Url.Action("Create", "NhaCungCaps", new { area = "Admin" })',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            $('#errAdd').html("")
+                            alert("Thêm nhà cung cấp thành công")
+                            window.location.href = '@Url.Action("Index", "NhaCungCaps", new { area = "Admin" })'
+                        },
+                        error: function (response) {
+                            if (response.responseJSON.isvalid == false) {
+                                var err = ""
+                                for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                    err += `<p>${response.responseJSON.error[i]}</p>`
+                                }
+                                $('#errMes').html(err)
+                                console.log(response)
+                            }
+                            else {
+                                alert(`${response.responseJSON.errorClient}`)
+                                console.log(`${response.responseJSON.errorDev}`)
+                            }
+                        }
+                    })
+                    return
+                }
+                if (fuc == 'edit') {
+                    formData.append("MaNCC", $('#MaNCC').val())
+                    $.ajax({
+                        url: '@Url.Action("Edit", "NhaCungCaps", new { area = "Admin" })',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            $('#errMes').html("")
+                            alert("Sửa nhà cung cấp thành công")
+                            window.location.href = '@Url.Action("Index", "NhaCungCaps", new { area = "Admin" })'
+                        },
+                        error: function (response) {
+                            if (response.responseJSON.isvalid == false) {
+                                var err = ""
+                                for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                    err += `<p>${response.responseJSON.error[i]}</p>`
+                                }
+                                $('#errMes').html(err)
+                                console.log(response)
+                            }
+                            else {
+                                alert(`${response.responseJSON.errorClient}`)
+                                console.log(`${response.responseJSON.errorDev}`)
+                            }
+                        }
+                    })
+                    return
+                }
+            })
+        })
+    </script>
+}

@@ -1,0 +1,219 @@
+﻿@model TShopping.Data.KhachHang
+@{
+    ViewData["Title"] = "Profile";
+}
+<div class="container">
+    <h2>Quản lý tài khoản</h2>
+
+    <div>
+        <h4>Thay đổi thông tin tài khoản</h4>
+        <hr />
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item"><a class="nav-link bg-primary text-white link" style="cursor: pointer">Thông tin tài khoản</a></li>
+                    <li class="nav-item"><a class="nav-link link" style="cursor: pointer">Mật khẩu</a></li>
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <div class="row content">
+                    <div class="col-md-6">
+                        <div id="errMesProfile" class="text-danger"></div>
+                        <div class="form-group">
+                            <label>Tên đăng nhập</label>
+                            <input id="MaKh" class="form-control" disabled value="@Model.MaKh" />
+                        </div>
+                        <div class="form-group">
+                            <label>Email*</label>
+                            <input id="Email" class="form-control" value="@Model.Email" />
+                        </div>
+                        <div class="form-group">
+                            <label>Họ tên*</label>
+                            <input id="HoTen" class="form-control" value="@Model.HoTen" />
+                        </div>
+                        <div class="form-group">
+                            <label>Giới tính*</label>
+                            <div>
+                                @if (Model.GioiTinh)
+                                {
+                                    <input type="radio" id="Nam" checked name="gender"/> <span>Nam</span>
+                                    <input type="radio" id="Nu" name="gender" /> <span>Nữ</span>
+                                }
+                                else
+                                {
+                                    <input type="radio" id="Nam" name="gender"  /> <span>Nam</span>
+                                    <input type="radio" id="Nu" name="gender" checked /> <span>Nữ</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày sinh*</label>
+                            <input type="date" id="NgaySinh" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ</label>
+                            <input type="text" id="DiaChi" class="form-control" value="@Model.DiaChi"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="text" id="DienThoai" class="form-control" value="@Model.DienThoai" />
+                        </div>
+                        <button id="update-profile-button" type="button" class="btn btn-primary my-2 text-white">Lưu</button>
+                    </div>
+                </div>
+                <div class="row content d-none">
+                    <div class="col-md-6">
+                        <div id="errMesPassword" class="text-danger"></div>
+                        <div class="form-group">
+                            <label>Mật khẩu cũ</label>
+                            <input id="MatKhauCu" type="password" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu mới</label>
+                            <input id="MatKhauMoi" type="password" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="ShowPassword" /> Hiển thị mật khẩu
+                        </div>
+                        <button id="update-password-button" type="button" class="btn btn-primary my-2 text-white">Đổi mật khẩu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        console.log("Lên")
+        $(document).ready(function () {
+            var ngaySinh = '@Model.NgaySinh.ToString("yyyy-MM-dd")'
+            $('#NgaySinh').val(ngaySinh)
+            // Hiển thị màu và bg cho phần sidebar
+            $('.link').click(function () {
+                $('.link').removeClass('bg-primary')
+                $('.link').removeClass('text-white')
+                $(this).addClass('bg-primary')
+                $(this).addClass('text-white')
+                console.log('Oke chưa')
+            })
+            // Hiển thị cho phần content
+            $('.link').each(function (index, element) {
+                $(element).click(function () {
+                    $('.content').addClass('d-none')
+                    var contents = $('.content')
+                    $(contents[index]).removeClass('d-none')
+                })
+            })
+            // Hiển thị mật khẩu
+            $('#ShowPassword').change(function () {
+                if ($(this).prop('checked') == true) {
+                    $('#MatKhauCu').attr('type', 'text')
+                    $('#MatKhauMoi').attr('type', 'text')
+                } else {
+                    $('#MatKhauCu').attr('type', 'password')
+                    $('#MatKhauMoi').attr('type', 'password')
+                }
+            })
+            $('#update-profile-button').click(function () {
+                var formData = new FormData()
+                var gioiTinh
+                if($('#Nam').prop('checked') == true){
+                    gioiTinh = true
+                }
+                else{
+                    gioiTinh = false
+                }
+                formData.append('MaKh', $('#MaKh').val())
+                formData.append('GioiTinh', gioiTinh)
+                formData.append('Email', $('#Email').val())
+                formData.append('HoTen', $('#HoTen').val())
+                formData.append('NgaySinh', $('#NgaySinh').val())
+                formData.append('DiaChi', $('#DiaChi').val())
+                formData.append('DienThoai', $('#DienThoai').val())
+                $.ajax({
+                    url: '@Url.Action("EditProfile", "KhachHang", new { area = "" })',
+                    type: "POST",
+                    data: formData,
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $('#errMesProfile').html('')
+                        var toast = $(`<div class="m-toast-message m-toast-success">
+                                                            <div class="m-toast-icon">
+                                                                <i class="fas fa-check-circle"></i>
+                                                            </div>
+                                                            <div class="m-toast-text">Cập nhật thông tin tài khoản thành công</div>
+                                                            <div class="m-toast-close">
+                                                                <i class="fas fa-times"></i>
+                                                            </div>
+                                                        </div>`)
+                        $('.m-toast-box').html(toast)
+                        setTimeout(function () {
+                            toast.hide()
+                        }, 5000)
+                    },
+                    error: function (response) {
+                        if (response.responseJSON.isvalid == false) {
+                            var err = ""
+                            for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                err += `<p>${response.responseJSON.error[i]}</p>`
+                            }
+                            $('#errMesProfile').html(err)
+                            console.log(response)
+                        }
+                        else {
+                            window.location.href = '@Url.Action("Profile","KhachHang",new {area = ""})'
+                        }
+                    }
+                })
+            })
+            $('#update-password-button').click(function () {
+                var formData = new FormData()
+                formData.append('MatKhauCu', $('#MatKhauCu').val())
+                formData.append('MatKhauMoi', $('#MatKhauMoi').val())
+                formData.append('MaKh', $('#MaKh').val())
+                $.ajax({
+                    url: '@Url.Action("ChangePassword", "KhachHang", new { area = "" })',
+                    type: "POST",
+                    data: formData,
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        window.location.href = '@Url.Action("DangXuat", "KhachHang", new { area = "" })'
+                    },
+                    error: function (response) {
+                        if (response.responseJSON.isvalid == false) {
+                            var err = ""
+                            for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                err += `<p>${response.responseJSON.error[i]}</p>`
+                            }
+                            $('#errMesPassword').html(err)
+                            console.log(response)
+                        }
+                        else {
+                            var toast = $(`<div class="m-toast-message m-toast-error">
+                                                                        <div class="m-toast-icon">
+                                                                            <i class="fas fa-check-circle"></i>
+                                                                        </div>
+                                                                        <div class="m-toast-text">${response.responseJSON.errorClient}</div>
+                                                                        <div class="m-toast-close">
+                                                                            <i class="fas fa-times"></i>
+                                                                        </div>
+                                                                    </div>`)
+                            $('.m-toast-box').html(toast)
+                            setTimeout(function () {
+                                toast.hide()
+                            }, 5000)
+                            $('#errMesPassword').html('')
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    }
+                })
+            })
+        })
+    </script>
+}
+
+

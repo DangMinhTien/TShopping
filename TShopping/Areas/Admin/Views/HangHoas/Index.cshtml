@@ -1,0 +1,279 @@
+﻿@using TShopping.Helpers;
+@model IEnumerable<TShopping.Data.HangHoa>
+@{
+    TempData["Title"] = "Trang hàng hóa";
+    List<TShopping.Data.Loai> Loais = ViewBag.Loai as List<TShopping.Data.Loai> ?? new List<TShopping.Data.Loai>();
+    List<TShopping.Data.NhaCungCap> NhaCungCaps = ViewBag.NhaCungCap as List<TShopping.Data.NhaCungCap> ?? new List<TShopping.Data.NhaCungCap>();
+    var pagingModel = ViewBag.Paging as PagingModel;
+}
+<div class="mb-5 d-flex justify-content-between align-content-center">
+    <button type="button" id="btnAdd" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddModal">Thêm mới</button>
+    <form class="d-flex align-content-center" asp-action="Index" asp-controller="HangHoas" asp-area="Admin">
+        <input type="text" name="search" class="mx-1" placeholder="Tìm theo tên" value="@ViewBag.search"/>
+        <input type="submit"class="btn btn-primary" value="Tìm" />
+    </form>
+</div>
+<table class="table table-bordered" style="width: 100%; overflow-x: scroll">
+    <tr>
+        <th>Mã hàng</th>
+        <th>Tên hàng</th>
+        <th>Loại</th>
+        <th>Đơn vị tính</th>
+        <th>Đơn giá</th>
+        <th>Ngày sản xuất</th>
+        <th>Giảm giá</th>
+        <th>Mô tả</th>
+        <th>Nhà cung cấp</th>
+        <th>Hình</th>
+        <th>Chức năng</th>
+    </tr>
+    @foreach(var item in Model)
+    {
+        <tr data-id="@item.MaHh">
+            <td>@item.MaHh</td>
+            <td>@item.TenHh</td>
+            <td data-maLoai="@item.MaLoai">@item.MaLoaiNavigation?.TenLoai</td>
+            <td>@item.MoTaDonVi</td>
+            <td data-dongia="@item.DonGia">@string.Format("{0:N0}", item.DonGia)đ</td>
+            <td data-ngaySX="@item.NgaySx.ToString("yyyy-MM-dd")">@item.NgaySx.ToString("dd/MM/yyyy")</td>
+            <td>@item.GiamGia</td>
+            <td>@item.MoTa</td>
+            <td data-maNCC="@item.MaNcc">@item.MaNccNavigation?.TenCongTy</td>
+            <td>
+                <img class="img-thumbnail" src="~/Hinh/HangHoa/@item.Hinh" alt="@item.TenHh"/>
+            </td>
+            <td class="d-flex">
+                <button type="button" class="btn btn-warning btnEdit mx-1" data-bs-toggle="modal" data-bs-target="#AddModal">Sửa</button>
+                <button type="button" class="btn btn-danger btnDelete mx-1">Xóa</button>
+            </td>
+        </tr>
+    }
+</table>
+<partial name="_PagingAdminPartial" model="@pagingModel"></partial>
+<div class="modal fade" id="AddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 750px!important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Hàng hóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-danger" id="errMes"></div>
+                <div class="row">
+                    <div class="col-xl-6 col-sm-12">
+                        <input type="hidden" id="MaHh"/>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Tên hàng hóa:</label>
+                            <input type="text" class="form-control" id="TenHh">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">Loại hàng:</label>
+                            <select class="form-control" id="MaLoai">
+                                @foreach(var item in Loais)
+                                {
+                                    <option value="@item.MaLoai">@item.TenLoai</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Đơn vị tính:</label>
+                            <input type="text" class="form-control" id="MoTaDonVi">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Đơn giá:</label>
+                            <input type="number" class="form-control" id="DonGia">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Hình ảnh:</label>
+                            <input type="file" class="form-control" id="Hinh">
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Ngày sản xuất:</label>
+                            <input type="date" class="form-control" id="NgaySX">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Giảm giá:</label>
+                            <input type="number" class="form-control" id="GiamGia">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Mô tả:</label>
+                            <textarea class="form-control" id="MoTa" rows="1"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Nhà cung cấp:</label>
+                            <select class="form-control" id="MaNCC">
+                                @foreach(var item in NhaCungCaps)
+                                {
+                                    <option value="@item.MaNcc">@item.TenCongTy</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <img class="img-thumbnail" style="width: 200px; height: 150px; object-fit: contain" id="ImagePreview" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary" id="btnSubmit"></button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Lắng nghe sự kiện change của input file
+            var fileInput = document.getElementById('Hinh');
+            fileInput.addEventListener('change', function (event) {
+                // Gọi hàm để hiển thị ảnh
+                displayImage(event.target);
+            });
+        });
+
+        function displayImage(input) {
+            var file = input.files[0];
+
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // Hiển thị ảnh lên thẻ img
+                    var imagePreview = document.getElementById('ImagePreview');
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+
+                // Đọc dữ liệu của file ảnh
+                reader.readAsDataURL(file);
+            }
+        }
+        var fuc = 'add'
+        $(document).ready(function () {
+            $('.btnEdit').click(function () {
+                fuc = 'edit'
+                $('#btnSubmit').text('Sửa')
+                $('#errMes').html('')
+                var trParent = $(this).closest('tr')
+                $('#MaHh').val(trParent.children('td:eq(0)').text())
+                $('#TenHh').val(trParent.children('td:eq(1)').text())
+                $('#MaLoai').val(trParent.children('td:eq(2)').attr('data-maLoai'))
+                $('#MoTaDonVi').val(trParent.children('td:eq(3)').text())
+                $('#DonGia').val(trParent.children('td:eq(4)').attr('data-dongia'))
+                $('#NgaySX').val(trParent.children('td:eq(5)').attr('data-NgaySX'))
+                $('#GiamGia').val(trParent.children('td:eq(6)').text())
+                $('#MoTa').val(trParent.children('td:eq(7)').text())
+                $('#MaNCC').val(trParent.children('td:eq(8)').attr('data-maNCC'))
+                $('#ImagePreview').attr('src', trParent.children('td:eq(9)').children('img').attr('src'))
+            })
+            $('#btnAdd').click(function () {
+                fuc = 'add'
+                $('#btnSubmit').text('Thêm')
+                $('#errMes').html('')
+                $('#ImagePreview').attr('src','')
+                console.log(fuc)
+            })
+            $('.btnDelete').click(function(){
+                var trParent = $(this).closest('tr')
+                var MahH = trParent.children('td:eq(0)').text()
+                var TenHh = trParent.children('td:eq(1)').text()
+                if (confirm(`Bạn có muốn xóa ${TenHh} không ?`)) {
+                    var formDelete = new FormData()
+                    formDelete.append("MaHh", MahH)
+                    $.ajax({
+                        url: '@Url.Action("Delete", "HangHoas", new { area = "Admin" })',
+                        type: "POST",
+                        data: formDelete,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            alert("Xóa hàng thành công")
+                            window.location.href = '/Admin/HangHoas/Index?page=@pagingModel?.currentPage&search=@ViewBag.search'
+                        },
+                        error: function (response) {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    })
+                }
+            })
+            $('#btnSubmit').click(function () {
+                var formData = new FormData()
+                formData.append("TenHh", $('#TenHh').val())
+                formData.append("MaLoai", $('#MaLoai').val())
+                formData.append("MoTaDonVi", $('#MoTaDonVi').val())
+                formData.append("DonGia", $('#DonGia').val())
+                formData.append("NgaySX", $('#NgaySX').val())
+                formData.append("GiamGia", $('#GiamGia').val())
+                formData.append("MoTa", $('#MoTa').val())
+                formData.append("MaNCC", $('#MaNCC').val())
+                formData.append("Hinh", document.getElementById('Hinh').files[0])
+                if(fuc == 'add'){
+                    $.ajax({
+                        url: '@Url.Action("Create","HangHoas", new {area = "Admin"})',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            $('#errAdd').html("")
+                            alert("Thêm hàng thành công")
+                            window.location.href = '/Admin/HangHoas/Index?page=@pagingModel.currentPage&search=@ViewBag.search'
+                        },
+                        error: function (response) {
+                            if (response.responseJSON.isvalid == false) {
+                                var err = ""
+                                for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                    err += `<p>${response.responseJSON.error[i]}</p>`
+                                }
+                                $('#errMes').html(err)
+                                console.log(response)
+                            }
+                            else {
+                                alert(`${response.responseJSON.errorClient}`)
+                                console.log(`${response.responseJSON.errorDev}`)
+                            }
+                        }
+                    })
+                    return
+                }
+                if (fuc == 'edit') {
+                    formData.append("MaHh", $('#MaHh').val())
+                    $.ajax({
+                        url: '@Url.Action("Edit", "HangHoas", new { area = "Admin" })',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            $('#errAdd').html("")
+                            alert("Sửa hàng thành công")
+                            window.location.href = '/Admin/HangHoas/Index?page=@pagingModel.currentPage&search=@ViewBag.search'
+                        },
+                        error: function (response) {
+                            if (response.responseJSON.isvalid == false) {
+                                var err = ""
+                                for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                    err += `<p>${response.responseJSON.error[i]}</p>`
+                                }
+                                $('#errMes').html(err)
+                                console.log(response)
+                            }
+                            else {
+                                alert(`${response.responseJSON.errorClient}`)
+                                console.log(`${response.responseJSON.errorDev}`)
+                            }
+                        }
+                    })
+                    return
+                }
+            })
+        })
+    </script>
+}

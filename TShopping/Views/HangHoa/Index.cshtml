@@ -1,0 +1,52 @@
+﻿@model IEnumerable<TShopping.ViewModels.HangHoaVM>
+@{
+    ViewData["Title"] = "Trang Hàng hóa";
+    Layout = "_DanhSachHangHoa";
+    int? maLoai = ViewBag.maLoai;
+    var pagingModel = ViewBag.pagingModel as PagingModel;
+}
+@section BreakCum {
+    <div class="container-fluid page-header py-5">
+        <h1 class="text-center text-white display-6">Shop</h1>
+        <ol class="breadcrumb justify-content-center mb-0">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Pages</a></li>
+            <li class="breadcrumb-item active text-white">Shop</li>
+        </ol>
+    </div>
+}
+@section SideBar {
+    <partial name="_SideBarPartial" model="maLoai"></partial>
+}
+<h5 class="my-0">Có @Model.Count() sản phẩm</h5>
+@foreach (var item in Model)
+{
+    <div class="col-md-6 col-lg-6 col-xl-4">
+        <div class="rounded position-relative fruite-item">
+            <div class="fruite-img">
+                <a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh">
+                    <img style="height: 235px; object-fit: contain" src="~/Hinh/HangHoa/@item.Hinh" 
+                    class="img-fluid w-100 rounded-top" alt="@item.Hinh" />
+                </a>
+            </div>
+            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">@item.TenLoai</div>
+            <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                <a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh">
+                    <h4 style="height: 30px; overflow: hidden">@item.TenHh</h4>
+                </a>
+                <p style="height: 72px; overflow: hidden">@item.MoTaNgan</p>
+                <div class="">
+                    <p class="text-dark text-center fs-5 fw-bold mb-0">@string.Format("{0:N0}", item.DonGia)đ</p>
+                    <div class="d-flex justify-content-center">
+                        <a asp-action="AddToCart" asp-controller="Cart" asp-route-id="@item.MaHh" class="btn border border-secondary rounded-pill px-3 text-primary">
+                            <i class="fa fa-shopping-bag me-2 text-primary"></i> 
+                            Thêm giỏ hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<partial name="_PagingClientPartial" model="@pagingModel"></partial>
+

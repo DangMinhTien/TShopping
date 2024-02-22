@@ -1,0 +1,237 @@
+﻿@model IEnumerable<HoaDon>
+@{
+    var trangThais = ViewBag.TrangThai as IEnumerable<TrangThai> ?? new List<TrangThai>();
+    var pagingModel = ViewBag.Paging as PagingModel;
+}
+<div class="mb-5 d-flex justify-content-between align-content-center">
+    <form class="d-flex align-content-center" asp-action="Index" asp-controller="HoaDons" asp-area="Admin" method="get">
+        <input type="text" name="search" class="mx-1" placeholder="Tìm theo mã hóa đơn" value="@ViewBag.search" />
+        <input type="submit" class="btn btn-primary" value="Tìm" />
+    </form>
+</div>
+<table class="table table-bordered" style="width: 100%; overflow-x: scroll">
+    <tr>
+        <th>Mã hóa đơn</th>
+        <th>Người đặt</th>
+        <th>Người nhận</th>
+        <th>Ngày đặt</th>
+        <th>Cách thanh toán</th>
+        <th>Cách vận chuyển</th>
+        <th>Ghi chú</th>
+        <th>Địa chỉ</th>
+        <th>Điện thoại</th>
+        <th>Trạng thái</th>
+        <th style="min-width: 190px;">Chức năng</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr data-id="@item.MaHd">
+            <td>
+                <p data-bs-toggle="modal" data-bs-target="#Detail" class="text-decoration-underline text-primary mahd" style="cursor: pointer;">@item.MaHd</p>
+            </td>
+            <td>@item?.MaKhNavigation.HoTen</td>
+            <td style="min-width: 140px;">@item?.HoTen</td>
+            <td style="min-width: 100px;">@item?.NgayDat.ToString("dd-MM-yyyy")</td>
+            <td>@item?.CachThanhToan</td>
+            <td>@item?.CachVanChuyen</td>
+            <td>@item?.GhiChu</td>
+            <td>@item?.DiaChi</td>
+            <td>@item?.DienThoai</td>
+            <td style="min-width: 140px;">
+                @switch (item?.MaTrangThai)
+                {
+                    case -1:
+                        <span class="bg-danger px-1" style="border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                        break;
+                    case 0:
+                        <span class="bg-secondary px-1" style="border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                        break;
+                    case 1:
+                        <span class="bg-primary px-1" style="border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                        break;
+                    case 2:
+                        <span class="bg-warning px-1" style="border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                        break;
+                    case 3:
+                        <span class="bg-success px-1" style="border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                        break;
+                }
+            </td>
+            <td class="d-flex">
+                <button data-id="@item.MaHd" data-trangthai="@item.MaTrangThai" type="button" class="btn btn-warning btnEdit mx-1" data-bs-toggle="modal" data-bs-target="#EditModal">Trạng thái</button>
+                <button data-id="@item.MaHd" type="button" class="btn btn-danger btnHuy mx-1">Hủy</button>
+            </td>
+        </tr>
+    }
+</table>
+<partial name="_PagingAdminPartial" model="@pagingModel"></partial>
+<div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Trạng thái:</label>
+                    <select class="form-control" id="MaTrangThai">
+                        @foreach(var item in trangThais)
+                        {
+                            <option value="@item.MaTrangThai">@item.TenTrangThai</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary" id="btnSubmit">Sửa trạng thái</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="Detail" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 950px!important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row container">
+                    <div class="col-4">Mã hóa đơn:<span class="mx-2" id="MaHd"></span></div>
+                    <div class="col-4">Người đặt:<span class="mx-2" id="NguoiDat"></span></div>
+                    <div class="col-4">Người nhận:<span class="mx-2" id="NguoiNhan"></span></div>
+                    <div class="col-4">Ngày đặt:<span class="mx-2" id="NgayDat"></span></div>
+                    <div class="col-4">Cách thanh toán:<span class="mx-2" id="CachThanhToan"></span></div>
+                    <div class="col-4">Cách vận chuyển:<span class="mx-2" id="CachVanChuyen"></span></div>
+                    <div class="col-4">Ghi chú:<span class="mx-2" id="GhiChu"></span></div>
+                    <div class="col-4">Địa chỉ:<span class="mx-2" id="DiaChi"></span></div>
+                    <div class="col-4">Điện thoại:<span class="mx-2" id="DienThoai"></span></div>
+                    <div class="col-4">Trạng thái:<span class="mx-2" id="TrangThai"></span></div>
+                    <div class="col-4">Tổng số lượng:<span class="mx-2" id="TongSoLuong"></span></div>
+                    <div class="col-4">Tổng tiền:<span class="mx-2" id="TongTien"></span></div>
+                </div>
+                <table class="table table-bordered my-2">
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã hàng</th>
+                        <th>Tên hàng</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                        <th>Ảnh</th>
+                    </tr>
+                    <tbody id="DetailHoaDon">
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.mahd').click(function () {
+                console.log($(this).text())
+                var mahd = $(this).text()
+                $.ajax({
+                    url: '@Url.Action("Detail", "HoaDons", new { area = "Admin" })' + `?MaHd=${mahd}`,
+                    type: "GET",
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        console.log(data)
+                        // Hiển thị đơn hàng
+                        $('#MaHd').text(data.hoadon.mahd)
+                        $('#NguoiDat').text(data.hoadon.nguoidat)
+                        $('#NguoiNhan').text(data.hoadon.nguoinhan)
+                        $('#NgayDat').text(data.hoadon.ngaydat)
+                        $('#CachThanhToan').text(data.hoadon.cachthanhtoan)
+                        $('#CachVanChuyen').text(data.hoadon.cachvanchuyen)
+                        $('#GhiChu').text(data.hoadon.ghichu)
+                        $('#DiaChi').text(data.hoadon.diachi)
+                        $('#DienThoai').text(data.hoadon.dienthoai)
+                        $('#TrangThai').text(data.hoadon.trangthai)
+                        $('#TongSoLuong').text(data.hoadon.tongsoluong)
+                        $('#TongTien').text(data.hoadon.tongtien)
+                        // Hiển thị chi tiết
+                        var detailHoaDon = ''
+                        $(data.chitiethoadon).each(function (index, element) {
+                            detailHoaDon += `<tr>
+                                    <td>${index+1}</td>
+                                    <td>${element.mahang}</td>
+                                    <td>${element.tenhang}</td>
+                                    <td>${element.soluong}</td>
+                                    <td>${element.dongia}</td>
+                                    <td>${element.thanhtien}</td>
+                                    <td>
+                                        <img class="img-thumbnail" src="${element.anh}" style="width: 150px;" />
+                                    </td>
+                                </tr>`
+                        })
+                        $('#DetailHoaDon').html(detailHoaDon)
+                    },
+                    error: function (response) {
+                        alert(`${response.responseJSON.errorClient}`)
+                        console.log(`${response.responseJSON.errorDev}`)
+                    }
+                })
+            })
+            $('.btnEdit').click(function(){
+                var trangThai = $(this).attr('data-trangthai')
+                if(trangThai == -1)
+                    trangThai = 0
+                $('#MaTrangThai').val(trangThai)
+                var maHd = $(this).attr('data-id')
+                $('#btnSubmit').click(function(){
+                    var formData = new FormData()
+                    formData.append('MaHd', maHd)
+                    formData.append('MaTrangThai', $('#MaTrangThai').val())
+                    $.ajax({
+                        url: '@Url.Action("Update", "HoaDons", new { area = "Admin" })',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            alert('Cập nhật trạng thái đơn hàng thành công')
+                            window.location.href = '@Url.Action("Index", "HoaDons", new { area = "Admin" })' + '?page=@pagingModel?.currentPage&search=@ViewBag.search'
+                        },
+                        error: function (response) {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    })
+                })
+            })
+            $('.btnHuy').click(function () {
+                var formData = new FormData()
+                var maHd = $(this).attr('data-id')
+                formData.append('MaHd', maHd)
+                $.ajax({
+                    url: '@Url.Action("Abort", "HoaDons", new { area = "Admin" })',
+                    type: "POST",
+                    data: formData,
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        alert('Hủy đơn hàng thành công')
+                        window.location.href = '@Url.Action("Index", "HoaDons", new { area = "Admin" })' + '?page=@pagingModel?.currentPage&search=@ViewBag.search'
+                    },
+                    error: function (response) {
+                        alert(`${response.responseJSON.errorClient}`)
+                        console.log(`${response.responseJSON.errorDev}`)
+                    }
+                })
+            })
+        })    
+    </script>
+}

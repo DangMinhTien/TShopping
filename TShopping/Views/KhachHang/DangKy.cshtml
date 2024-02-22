@@ -1,0 +1,107 @@
+﻿@model TShopping.ViewModels.RegisterCustomerVM
+@{
+    ViewData["Title"] = "DangKy";
+}
+<!-- Checkout Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <h1 class="mb-4">Đăng ký</h1>
+        <form asp-action="DangKy" asp-controller="KhachHang" method="post" enctype="multipart/form-data">
+            <div class="text-danger" asp-validation-summary="All"></div>
+            <div class="row g-5 mt-4">
+                <div class="col-md-12 col-xl-8 row">
+                    <div class="col-xl-6 col-md-12">
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="MaKh"></label><sup>*</sup>
+                            <input type="text" class="form-control" asp-for="MaKh">
+                            <span asp-validation-for="MaKh" class="text-danger"></span>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="MatKhau"></label><sup>*</sup>
+                            <input type="text" class="form-control" asp-for="MatKhau">
+                            <span asp-validation-for="MatKhau" class="text-danger"></span>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="HoTen"></label><sup>*</sup>
+                            <input type="text" class="form-control" asp-for="HoTen">
+                            <span asp-validation-for="HoTen" class="text-danger"></span>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="GioiTinh"></label><sup>*</sup>
+                            <div class="form-item">
+                                <input type="radio" asp-for="GioiTinh" value="true" checked="checked"> Nam
+                                <input  type="radio" asp-for="GioiTinh" value="false"/> Nữ
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="NgaySinh"></label><sup>*</sup>
+                            <input type="date" class="form-control" asp-for="NgaySinh">
+                            <span asp-validation-for="NgaySinh" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-md-12">
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="DiaChi"></label>
+                            <input class="form-control" asp-for="DiaChi">
+                            <span asp-validation-for="DiaChi" class="text-danger"></span>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="DienThoai"></label>
+                            <input class="form-control" asp-for="DienThoai">
+                            <span asp-validation-for="DienThoai" class="text-danger"></span>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="Email"></label><sup>*</sup>
+                            <input class="form-control" asp-for="Email">
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label my-3" asp-for="Anh"></label>
+                            <input type="file" class="form-control" asp-for="Anh">
+                            <span asp-validation-for="Anh" class="text-danger"></span>
+                            <img id="imagePreview" class="mt-2" style="display:none; max-width: 300px; max-height: 300px;">
+                        </div>
+                    </div>
+                    <div class="form-item my-2 col-12">
+                        <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+                            <button type="submit" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary">Đăng ký</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Checkout Page End -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"></partial>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Lắng nghe sự kiện change của input file
+            var fileInput = document.getElementById('Anh');
+            fileInput.addEventListener('change', function (event) {
+                // Gọi hàm để hiển thị ảnh
+                displayImage(event.target);
+            });
+        });
+
+        function displayImage(input) {
+            var file = input.files[0];
+
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // Hiển thị ảnh lên thẻ img
+                    var imagePreview = document.getElementById('imagePreview');
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+
+                // Đọc dữ liệu của file ảnh
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+}
+

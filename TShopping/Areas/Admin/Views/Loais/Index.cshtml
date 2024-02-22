@@ -1,0 +1,162 @@
+﻿@model IEnumerable<Loai>
+@{
+}
+<button type="button" id="btnAdd" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddModal">Thêm mới</button>
+<table class="table table-bordered" style="width: 100%; overflow-x: scroll">
+    <tr>
+        <th>Mã loại</th>
+        <th>Tên loại</th>
+        <th>Mô tả</th>
+        <th>Chức năng</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr data-id="@item.MaLoai">
+            <td>@item.MaLoai</td>
+            <td>@item.TenLoai</td>
+            <td>@item.MoTa</td>
+            <td class="d-flex">
+                <button type="button" class="btn btn-warning btnEdit mx-1" data-bs-toggle="modal" data-bs-target="#AddModal">Sửa</button>
+                <button type="button" class="btn btn-danger btnDelete mx-1">Xóa</button>
+            </td>
+        </tr>
+    }
+</table>
+<div class="modal fade" id="AddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Loại hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-danger" id="errMes"></div>
+                <input type="hidden" id="MaLoai" />
+                <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Tên loại:</label>
+                    <input type="text" class="form-control" id="TenLoai">
+                </div>
+                <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Mô tả:</label>
+                    <input type="text" class="form-control" id="MoTa">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary" id="btnSubmit"></button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        var fuc = 'add'
+        $(document).ready(function () {
+            $('#btnAdd').click(function () {
+                fuc = 'add'
+                $('#errMes').html('')
+                $('#btnSubmit').text('Thêm mới')
+            })
+            $('.btnEdit').click(function () {
+                fuc = 'edit'
+                $('#errMes').html('')
+                $('#btnSubmit').text('Sửa')
+                var trParent = $(this).closest('tr')
+                $('#MaLoai').val(trParent.children('td:eq(0)').text())
+                $('#TenLoai').val(trParent.children('td:eq(1)').text())
+                $('#MoTa').val(trParent.children('td:eq(2)').text())
+            })
+            $('.btnDelete').click(function () {
+                var trParent = $(this).closest('tr')
+                var MaLoai = trParent.children('td:eq(0)').text()
+                var TenLoai = trParent.children('td:eq(1)').text()
+                if (confirm(`Bạn có muốn xóa ${TenLoai} không ?`)) {
+                    var formDelete = new FormData()
+                    formDelete.append("MaLoai", MaLoai)
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Loais", new { area = "Admin" })',
+                        type: "POST",
+                        data: formDelete,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            alert("Xóa loại hàng thành công")
+                            window.location.href = '@Url.Action("Index", "Loais", new { area = "Admin" })'
+                        },
+                        error: function (response) {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    })
+                }
+            })
+            $('#btnSubmit').click(function () {
+                var formData = new FormData()
+                formData.append('TenLoai', $('#TenLoai').val())
+                formData.append('MoTa', $('#MoTa').val())
+                if (fuc == 'add') {
+                    $.ajax({
+                        url: '@Url.Action("Create", "Loais", new { area = "Admin" })',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            $('#errMes').html("")
+                            alert("Thêm loại hàng thành công")
+                            window.location.href = '@Url.Action("Index","Loais", new {area = "Admin"})'
+                        },
+                        error: function (response) {
+                            if (response.responseJSON.isvalid == false) {
+                                var err = ""
+                                for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                    err += `<p>${response.responseJSON.error[i]}</p>`
+                                }
+                                $('#errMes').html(err)
+                                console.log(response)
+                            }
+                            else {
+                                alert(`${response.responseJSON.errorClient}`)
+                                console.log(`${response.responseJSON.errorDev}`)
+                            }
+                        }
+                    })
+                    return
+                }
+                if (fuc == 'edit') {
+                    formData.append('MaLoai', $('#MaLoai').val())
+                    $.ajax({
+                        url: '@Url.Action("Edit", "Loais", new { area = "Admin" })',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            $('#errMes').html("")
+                            alert("Sửa loại hàng thành công")
+                            window.location.href = '@Url.Action("Index", "Loais", new { area = "Admin" })'
+                        },
+                        error: function (response) {
+                            if (response.responseJSON.isvalid == false) {
+                                var err = ""
+                                for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                    err += `<p>${response.responseJSON.error[i]}</p>`
+                                }
+                                $('#errMes').html(err)
+                                console.log(response)
+                            }
+                            else {
+                                alert(`${response.responseJSON.errorClient}`)
+                                console.log(`${response.responseJSON.errorDev}`)
+                            }
+                        }
+                    })
+                    return
+                }
+            })
+        })
+    </script>
+}

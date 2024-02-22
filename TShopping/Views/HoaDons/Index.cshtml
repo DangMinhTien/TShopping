@@ -1,0 +1,189 @@
+﻿@using TShopping.Data
+@model IEnumerable<HoaDon>
+@{
+    
+}
+<div class="container">
+    <table class="table table-bordered" style="width: 100%; overflow-x: scroll">
+        <tr>
+            <th>Mã hóa đơn</th>
+            <th>Người đặt</th>
+            <th style="min-width: 140px;">Người nhận</th>
+            <th style="min-width: 110px;">Ngày đặt</th>
+            <th>Cách thanh toán</th>
+            <th>Cách vận chuyển</th>
+            <th>Ghi chú</th>
+            <th>Địa chỉ</th>
+            <th>Điện thoại</th>
+            <th style="min-width: 140px;">Trạng thái</th>
+            <th style="min-width: 160px;">Chức năng</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr data-id="@item.MaHd">
+                <td>
+                    <p data-bs-toggle="modal" data-bs-target="#Detail" class="text-decoration-underline text-primary mahd" style="cursor: pointer;">@item.MaHd</p>
+                </td>
+                <td>@item?.MaKhNavigation.HoTen</td>
+                <td>@item?.HoTen</td>
+                <td>@item?.NgayDat.ToString("dd-MM-yyyy")</td>
+                <td>@item?.CachThanhToan</td>
+                <td>@item?.CachVanChuyen</td>
+                <td>@item?.GhiChu</td>
+                <td>@item?.DiaChi</td>
+                <td>@item?.DienThoai</td>
+                <td class="text-light">
+                    @switch (item?.MaTrangThai)
+                    {
+                        case -1:
+                            <span class="bg-danger px-1" style="border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                            break;
+                        case 0:
+                            <span style="border-radius: 5px;" class="bg-primary px-1">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                            break;
+                        case 1:
+                            <span class="px-1" style="background-color: blue;border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                            break;
+                        case 2:
+                            <span class="bg-warning px-1" style="border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                            break;
+                        case 3:
+                            <span class="bg-success px-1" style="border-radius: 5px;">@item.MaTrangThaiNavigation.TenTrangThai</span>
+                            break;
+                    }
+                </td>
+                <td class="d-flex justify-content-center">
+                    @if(item?.MaTrangThai != 3 && item?.MaTrangThai != -1)
+                    {
+                        <button data-id="@item?.MaHd" type="button" class="btn btn-danger btnHuy mx-1">Hủy đơn hàng</button>
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+    <div class="modal fade" id="Detail" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 950px!important">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Chi tiết đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row container">
+                        <div class="col-4">Mã hóa đơn:<span class="mx-2" id="MaHd"></span></div>
+                        <div class="col-4">Người đặt:<span class="mx-2" id="NguoiDat"></span></div>
+                        <div class="col-4">Người nhận:<span class="mx-2" id="NguoiNhan"></span></div>
+                        <div class="col-4">Ngày đặt:<span class="mx-2" id="NgayDat"></span></div>
+                        <div class="col-4">Cách thanh toán:<span class="mx-2" id="CachThanhToan"></span></div>
+                        <div class="col-4">Cách vận chuyển:<span class="mx-2" id="CachVanChuyen"></span></div>
+                        <div class="col-4">Ghi chú:<span class="mx-2" id="GhiChu"></span></div>
+                        <div class="col-4">Địa chỉ:<span class="mx-2" id="DiaChi"></span></div>
+                        <div class="col-4">Điện thoại:<span class="mx-2" id="DienThoai"></span></div>
+                        <div class="col-4">Trạng thái:<span class="mx-2" id="TrangThai"></span></div>
+                        <div class="col-4">Tổng số lượng:<span class="mx-2" id="TongSoLuong"></span></div>
+                        <div class="col-4">Tổng tiền:<span class="mx-2" id="TongTien"></span></div>
+                    </div>
+                    <table class="table table-bordered my-2">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên hàng</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                            <th>Ảnh</th>
+                        </tr>
+                        <tbody id="DetailHoaDon">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.mahd').click(function () {
+                console.log($(this).text())
+                var mahd = $(this).text()
+                $.ajax({
+                    url: '@Url.Action("Detail", "HoaDons", new { area = "" })' + `?MaHd=${mahd}`,
+                    type: "GET",
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        console.log(data)
+                        // Hiển thị đơn hàng
+                        $('#MaHd').text(data.hoadon.mahd)
+                        $('#NguoiDat').text(data.hoadon.nguoidat)
+                        $('#NguoiNhan').text(data.hoadon.nguoinhan)
+                        $('#NgayDat').text(data.hoadon.ngaydat)
+                        $('#CachThanhToan').text(data.hoadon.cachthanhtoan)
+                        $('#CachVanChuyen').text(data.hoadon.cachvanchuyen)
+                        $('#GhiChu').text(data.hoadon.ghichu)
+                        $('#DiaChi').text(data.hoadon.diachi)
+                        $('#DienThoai').text(data.hoadon.dienthoai)
+                        $('#TrangThai').text(data.hoadon.trangthai)
+                        $('#TongSoLuong').text(data.hoadon.tongsoluong)
+                        $('#TongTien').text(data.hoadon.tongtien)
+                        // Hiển thị chi tiết
+                        var detailHoaDon = ''
+                        $(data.chitiethoadon).each(function (index, element) {
+                            detailHoaDon += `<tr>
+                                            <td>${index + 1}</td>
+                                            <td>${element.tenhang}</td>
+                                            <td>${element.soluong}</td>
+                                            <td>${element.dongia}</td>
+                                            <td>${element.thanhtien}</td>
+                                            <td>
+                                                <img class="img-thumbnail" src="${element.anh}" style="width: 150px;" />
+                                            </td>
+                                        </tr>`
+                        })
+                        $('#DetailHoaDon').html(detailHoaDon)
+                    },
+                    error: function (response) {
+                        alert(`${response.responseJSON.errorClient}`)
+                        console.log(`${response.responseJSON.errorDev}`)
+                    }
+                })
+            })
+            $('.btnHuy').click(function () {
+                var formData = new FormData()
+                var maHd = $(this).attr('data-id')
+                formData.append('MaHd', maHd)
+                $.ajax({
+                    url: '@Url.Action("Abort", "HoaDons", new { area = "" })',
+                    type: "POST",
+                    data: formData,
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        window.location.href = '@Url.Action("Index", "HoaDons", new { area = "" })'
+                    },
+                    error: function (response) {
+                        var toast = $(`<div class="m-toast-message m-toast-error">
+                                           <div class="m-toast-icon">
+                                               <i class="fas fa-check-circle"></i>
+                                           </div>
+                                           <div class="m-toast-text">${response.responseJSON.errorClient}</div>
+                                           <div class="m-toast-close">
+                                               <i class="fas fa-times"></i>
+                                           </div>
+                                       </div>`)
+                        $('.m-toast-box').html(toast)
+                        setTimeout(function () {
+                            toast.hide()
+                        }, 5000)
+                        console.log(`${response.responseJSON.errorDev}`)
+                    }
+                })
+            })
+        })
+    </script>
+}

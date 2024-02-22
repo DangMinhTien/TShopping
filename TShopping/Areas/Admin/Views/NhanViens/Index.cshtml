@@ -1,0 +1,143 @@
+﻿@model IEnumerable<NhanVien>
+@{
+    var pagingModel = ViewBag.Paging as PagingModel;
+}
+<div class="mb-5 d-flex justify-content-between align-content-center">
+    <button type="button" id="btnAdd" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddModal">Thêm nhân viên</button>
+    <form class="d-flex align-content-center" asp-action="Index" asp-controller="NhanViens" asp-area="Admin" method="get">
+        <input type="text" name="search" class="mx-1" placeholder="Tìm theo tên" value="@ViewBag.search" />
+        <input type="submit" class="btn btn-primary" value="Tìm" />
+    </form>
+</div>
+<table class="table table-bordered" style="width: 100%; overflow-x: scroll">
+    <tr>
+        <th>Mã Nhân viên</th>
+        <th>Họ tên</th>
+        <th>Email</th>
+        <th></th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr data-id="@item.MaNv">
+            <td>@item.MaNv</td>
+            <td>@item.HoTen</td>
+            <td>@item.Email</td>
+            <td class="d-flex">
+                <button type="button" class="btn btn-danger btnDelete mx-1">Xóa</button>
+            </td>
+        </tr>
+    }
+</table>
+<partial name="_PagingAdminPartial" model="@pagingModel"></partial>
+<div class="modal fade" id="AddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 550px!important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nhân viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-danger" id="errMes"></div>
+                <div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Mã nhân viên:</label>
+                        <input type="text" class="form-control" id="MaNv">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Tên nhân viên:</label>
+                        <input type="text" class="form-control" id="HoTen">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Email:</label>
+                        <input type="text" class="form-control" id="Email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Mật khẩu:</label>
+                        <input type="password" class="form-control" id="MatKhau">
+                        <input type="checkbox" id="showPassword"/> Hiển thị mật khẩu
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary" id="btnSubmit">Thêm mới</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnAdd').click(function () {
+                $('#errMes').html("")
+            })
+            $('#showPassword').change(function () {
+                if ($(this).prop("checked") == true) {
+                    $('#MatKhau').attr('type', 'text')
+                }
+                else {
+                    $('#MatKhau').attr('type', 'password')
+                }
+            })
+            $('#btnSubmit').click(function () {
+                var formData = new FormData()
+                formData.append('MaNv', $('#MaNv').val())
+                formData.append('HoTen', $('#HoTen').val())
+                formData.append('Email', $('#Email').val())
+                formData.append('MatKhau', $('#MatKhau').val())
+                $.ajax({
+                    url: '@Url.Action("Create", "NhanViens", new { area = "Admin" })',
+                    type: "POST",
+                    data: formData,
+                    catch: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $('#errMes').html("")
+                        alert("Thêm nhân viên thành công")
+                        window.location.href = '/Admin/NhanViens/Index?page=@pagingModel?.currentPage&search=@ViewBag.search'
+                    },
+                    error: function (response) {
+                        if (response.responseJSON.isvalid == false) {
+                            var err = ""
+                            for (var i = 0; i < response.responseJSON.error.length; i++) {
+                                err += `<p>${response.responseJSON.error[i]}</p>`
+                            }
+                            $('#errMes').html(err)
+                            console.log(response)
+                        }
+                        else {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    }
+                })
+            })
+            $('.btnDelete').click(function () {
+                var tr = $(this).closest('tr')
+                var maNv = tr.attr('data-id')
+                var tenNv = tr.children('td:eq(1)').text()
+                if (confirm(`Bạn có muốn xóa nhân viên ${tenNv} không ?`)) {
+                    var formData = new FormData()
+                    formData.append("MaNv", maNv)
+                    $.ajax({
+                        url: '@Url.Action("Delete", "NhanViens", new { area = "Admin" })',
+                        type: "POST",
+                        data: formData,
+                        catch: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            alert("Bạn vừa xóa nhân viên thành công")
+                            window.location.href = "/Admin/NhanViens/Index?page=@pagingModel?.currentPage&search=@ViewBag.search"
+                        },
+                        error: function (response) {
+                            alert(`${response.responseJSON.errorClient}`)
+                            console.log(`${response.responseJSON.errorDev}`)
+                        }
+                    })
+                }
+            })
+        })    
+    </script>
+}
